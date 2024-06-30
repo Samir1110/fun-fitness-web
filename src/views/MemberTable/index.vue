@@ -4,12 +4,12 @@
       <el-col :span="8">
         <el-input
           v-model="searchQuery"
-          placeholder="搜索员工名称或ID"
+          placeholder="搜索会员名称或ID"
           @input="handleSearch"
         />
       </el-col>
       <el-col :span="16" class="text-right">
-        <el-button type="primary" @click="addEmployee">新增员工</el-button>
+        <el-button type="primary" @click="addMember">新增会员</el-button>
       </el-col>
     </el-row>
     <el-table
@@ -20,61 +20,76 @@
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="ID" width="150">
+      <el-table-column align="center" label="账号" width="100">
         <template slot-scope="scope">
-          {{ scope.row.employeeAccount }}
+          {{ scope.row.memberAccount }}
         </template>
       </el-table-column>
-      <el-table-column label="姓名" width="150">
+      <el-table-column label="姓名" width="100">
         <template slot-scope="scope">
-          {{ scope.row.employeeName }}
+          {{ scope.row.memberName }}
         </template>
       </el-table-column>
-      <el-table-column label="性别" width="150" align="center">
+      <el-table-column label="性别" width="80" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.employeeGender }}</span>
+          <span>{{ scope.row.memberGender }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="年龄" width="150" align="center">
+      <el-table-column label="年龄" width="100" align="center">
         <template slot-scope="scope">
-          {{ scope.row.employeeAge }}
+          {{ scope.row.memberAge }}
         </template>
       </el-table-column>
-      <el-table-column class-name="status-col" label="职位" width="150" align="center">
+      <el-table-column label="身高" width="100" align="center">
         <template slot-scope="scope">
-          <el-tag>{{ scope.row.staff }}</el-tag>
+          {{ scope.row.memberHeight }}
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="entryTime" label="入职时间" width="250">
+      <el-table-column label="体重" width="100" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.memberWeight }}
+        </template>
+      </el-table-column>
+      <el-table-column label="电话" width="150" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.memberPhone }}
+        </template>
+      </el-table-column>
+      <el-table-column align="center" prop="cardTime" label="开卡时间" width="250">
         <template slot-scope="scope">
           <i class="el-icon-time" />
-          <span>{{ scope.row.entryTime }}</span>
+          <span>{{ scope.row.cardTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" width="150" align="center">
+      <el-table-column label="课时" width="100" align="center">
         <template slot-scope="scope">
-          {{ scope.row.employeeMessage }}
+          {{ scope.row.cardClass }}
+        </template>
+      </el-table-column>
+      <el-table-column label="剩余课时" width="100" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.cardNextClass }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="250">
         <template #default="scope">
           <el-button-group>
-            <el-button type="primary" @click="editEmployee(scope.row)">
+            <el-button type="primary" @click="editMember(scope.row)">
               修改
             </el-button>
-            <el-button type="danger" @click="handleDelete(scope.row.employeeAccount)">
+            <el-button type="danger" @click="handleDelete(scope.row.memberAccount)">
               删除
             </el-button>
           </el-button-group>
         </template>
       </el-table-column>
     </el-table>
-    <edit-employee
+    <edit-member
       :visible.sync="editDialogVisible"
-      :employee="selectedEmployee"
+      :member="selectedMember"
       @updated="fetchData"
     />
-    <add-employee
+    <add-member
       :visible.sync="addDialogVisible"
       @added="fetchData"
     />
@@ -82,15 +97,14 @@
 </template>
 
 <script>
-import { getList } from '@/api/table'
-import EditEmployee from './EditEmployee.vue'
-import AddEmployee from './AddEmployee.vue'
 import axios from 'axios'
+import EditMember from './EditMember.vue'
+import AddMember from './AddMember.vue'
 
 export default {
   components: {
-    AddEmployee,
-    EditEmployee
+    EditMember,
+    AddMember
   },
   data() {
     return {
@@ -98,7 +112,7 @@ export default {
       listLoading: true,
       addDialogVisible: false,
       editDialogVisible: false,
-      selectedEmployee: {},
+      selectedMember: {},
       searchQuery: ''
     }
   },
@@ -106,7 +120,7 @@ export default {
     filteredData() {
       return this.list.filter(item => {
         const query = this.searchQuery.toLowerCase()
-        return item.employeeName.toLowerCase().includes(query) || item.employeeAccount.toString().includes(query)
+        return item.memberName.toLowerCase().includes(query) || item.memberAccount.toString().includes(query)
       })
     }
   },
@@ -116,29 +130,31 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true
-      getList().then(response => {
-        this.list = response.data
-        this.listLoading = false
-      }).catch(error => {
-        console.error('Error fetching data:', error)
-        this.listLoading = false
-      })
+      axios.get('http://localhost:8080/member/selMember')
+        .then(response => {
+          this.list = response.data
+          this.listLoading = false
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error)
+          this.listLoading = false
+        })
     },
-    addEmployee() {
+    addMember() {
       this.addDialogVisible = true
     },
-    editEmployee(employee) {
-      this.selectedEmployee = { ...employee }
+    editMember(member) {
+      this.selectedMember = { ...member }
       this.editDialogVisible = true
     },
-    handleDelete(employeeAccount) {
-      this.$confirm('确定删除该员工吗？', '提示', {
+    handleDelete(memberAccount) {
+      this.$confirm('确定删除该会员吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        axios.post('http://localhost:8080/employee/delEmployee', new URLSearchParams({
-          employeeAccount: employeeAccount
+        axios.post('http://localhost:8080/member/delMember', new URLSearchParams({
+          memberAccount: memberAccount
         }), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -152,7 +168,7 @@ export default {
             this.fetchData() // 删除后刷新数据
           })
           .catch(error => {
-            console.error('Error deleting employee:', error)
+            console.error('Error deleting member:', error)
             this.$message({
               type: 'error',
               message: '删除失败!'

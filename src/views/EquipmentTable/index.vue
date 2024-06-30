@@ -4,12 +4,12 @@
       <el-col :span="8">
         <el-input
           v-model="searchQuery"
-          placeholder="搜索员工名称或ID"
+          placeholder="搜索设备名称或ID"
           @input="handleSearch"
         />
       </el-col>
       <el-col :span="16" class="text-right">
-        <el-button type="primary" @click="addEmployee">新增员工</el-button>
+        <el-button type="primary" @click="addEquipment">新增设备</el-button>
       </el-col>
     </el-row>
     <el-table
@@ -22,59 +22,48 @@
     >
       <el-table-column align="center" label="ID" width="150">
         <template slot-scope="scope">
-          {{ scope.row.employeeAccount }}
+          {{ scope.row.equipmentId }}
         </template>
       </el-table-column>
-      <el-table-column label="姓名" width="150">
+      <el-table-column label="设备名称" width="150">
         <template slot-scope="scope">
-          {{ scope.row.employeeName }}
+          {{ scope.row.equipmentName }}
         </template>
       </el-table-column>
-      <el-table-column label="性别" width="150" align="center">
+      <el-table-column label="设备位置" width="150" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.employeeGender }}</span>
+          <span>{{ scope.row.equipmentLocation }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="年龄" width="150" align="center">
+      <el-table-column label="设备状态" width="150" align="center">
         <template slot-scope="scope">
-          {{ scope.row.employeeAge }}
+          {{ scope.row.equipmentStatus }}
         </template>
       </el-table-column>
-      <el-table-column class-name="status-col" label="职位" width="150" align="center">
+      <el-table-column label="备注" width="250" align="center">
         <template slot-scope="scope">
-          <el-tag>{{ scope.row.staff }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" prop="entryTime" label="入职时间" width="250">
-        <template slot-scope="scope">
-          <i class="el-icon-time" />
-          <span>{{ scope.row.entryTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="备注" width="150" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.employeeMessage }}
+          {{ scope.row.equipmentMessage }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="250">
         <template #default="scope">
           <el-button-group>
-            <el-button type="primary" @click="editEmployee(scope.row)">
+            <el-button type="primary" @click="editEquipment(scope.row)">
               修改
             </el-button>
-            <el-button type="danger" @click="handleDelete(scope.row.employeeAccount)">
+            <el-button type="danger" @click="handleDelete(scope.row.equipmentId)">
               删除
             </el-button>
           </el-button-group>
         </template>
       </el-table-column>
     </el-table>
-    <edit-employee
+    <edit-equipment
       :visible.sync="editDialogVisible"
-      :employee="selectedEmployee"
+      :equipment="selectedEquipment"
       @updated="fetchData"
     />
-    <add-employee
+    <add-equipment
       :visible.sync="addDialogVisible"
       @added="fetchData"
     />
@@ -82,15 +71,14 @@
 </template>
 
 <script>
-import { getList } from '@/api/table'
-import EditEmployee from './EditEmployee.vue'
-import AddEmployee from './AddEmployee.vue'
 import axios from 'axios'
+import EditEquipment from './EditEquipment.vue'
+import AddEquipment from './AddEquipment.vue'
 
 export default {
   components: {
-    AddEmployee,
-    EditEmployee
+    EditEquipment,
+    AddEquipment
   },
   data() {
     return {
@@ -98,7 +86,7 @@ export default {
       listLoading: true,
       addDialogVisible: false,
       editDialogVisible: false,
-      selectedEmployee: {},
+      selectedEquipment: {},
       searchQuery: ''
     }
   },
@@ -106,7 +94,7 @@ export default {
     filteredData() {
       return this.list.filter(item => {
         const query = this.searchQuery.toLowerCase()
-        return item.employeeName.toLowerCase().includes(query) || item.employeeAccount.toString().includes(query)
+        return item.equipmentName.toLowerCase().includes(query) || item.equipmentId.toString().includes(query)
       })
     }
   },
@@ -116,29 +104,32 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true
-      getList().then(response => {
-        this.list = response.data
-        this.listLoading = false
-      }).catch(error => {
-        console.error('Error fetching data:', error)
-        this.listLoading = false
-      })
+      axios.get('http://localhost:8080/equipment/selEquipment')
+        .then(response => {
+          this.list = response.data
+          this.listLoading = false
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error)
+          this.listLoading = false
+        })
     },
-    addEmployee() {
+    addEquipment() {
       this.addDialogVisible = true
     },
-    editEmployee(employee) {
-      this.selectedEmployee = { ...employee }
+    editEquipment(equipment) {
+      this.selectedEquipment = { ...equipment }
       this.editDialogVisible = true
     },
-    handleDelete(employeeAccount) {
-      this.$confirm('确定删除该员工吗？', '提示', {
+    handleDelete(equipmentId) {
+      // 删除逻辑
+      this.$confirm('确定删除该设备吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        axios.post('http://localhost:8080/employee/delEmployee', new URLSearchParams({
-          employeeAccount: employeeAccount
+        axios.post('http://localhost:8080/equipment/delEquipment', new URLSearchParams({
+          equipmentId: equipmentId
         }), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -152,7 +143,7 @@ export default {
             this.fetchData() // 删除后刷新数据
           })
           .catch(error => {
-            console.error('Error deleting employee:', error)
+            console.error('Error deleting equipment:', error)
             this.$message({
               type: 'error',
               message: '删除失败!'

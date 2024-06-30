@@ -31,7 +31,7 @@ module.exports = [
     response: config => {
       const { username } = config.body
       const token = tokens[username]
-
+      console.log(token)
       // mock error
       if (!token) {
         return {
@@ -39,7 +39,7 @@ module.exports = [
           message: 'Account and password are incorrect.'
         }
       }
-
+      console.log(token)
       return {
         code: 20000,
         data: token

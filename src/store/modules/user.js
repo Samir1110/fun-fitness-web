@@ -29,11 +29,32 @@ const mutations = {
 
 const actions = {
   // user login
+  // login({ commit }, userInfo) {
+  //   const { username, password } = userInfo
+  //   return new Promise((resolve, reject) => {
+  //     login({ username: username.trim(), password: password }).then(response => {
+  //       const { data } = response
+  //       console.log(response)
+  //       console.log(data.token)
+  //       commit('SET_TOKEN', data.token)
+  //       setToken(data.token)
+  //       resolve()
+  //     }).catch(error => {
+  //       reject(error)
+  //     })
+  //   })
+  // },
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    console.log('Received userInfo:', userInfo) // 添加调试信息
+    const { adminAccount, adminPassword } = userInfo
+    if (!adminAccount || !adminPassword) {
+      return Promise.reject(new Error('Missing adminAccount or adminPassword'))
+    }
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ adminAccount: adminAccount.trim(), adminPassword: adminPassword }).then(response => {
         const { data } = response
+        console.log(response)
+        console.log(data.token)
         commit('SET_TOKEN', data.token)
         setToken(data.token)
         resolve()
@@ -42,7 +63,6 @@ const actions = {
       })
     })
   },
-
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {

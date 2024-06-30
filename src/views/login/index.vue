@@ -1,7 +1,6 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
+    <el-form ref="loginForm" :model="loginForm" class="login-form" auto-complete="on" label-position="left">
       <div class="title-container">
         <h3 class="title">Login Form</h3>
       </div>
@@ -42,44 +41,19 @@
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-
-      <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div>
-
     </el-form>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
 
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
-      } else {
-        callback()
-      }
-    }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
-      },
-      loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        username: '',
+        password: ''
       },
       loading: false,
       passwordType: 'password',
@@ -88,7 +62,7 @@ export default {
   },
   watch: {
     $route: {
-      handler: function(route) {
+      handler(route) {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
@@ -96,23 +70,37 @@ export default {
   },
   methods: {
     showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
+      this.passwordType = this.passwordType === 'password' ? '' : 'password'
       this.$nextTick(() => {
         this.$refs.password.focus()
       })
     },
     handleLogin() {
+      if (this.loading) return // 防止重复提交
+
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
+          const loginData = {
+            adminAccount: this.loginForm.username,
+            adminPassword: this.loginForm.password
+          }
+          console.log('Dispatching login with data:', loginData)// 添加调试信息
+          this.$store.dispatch('user/login', loginData).then(() => {
+            console.log('登录成功')
+
+            const targetPath = this.redirect && this.redirect !== '/404' ? this.redirect : '/dashboard'
+            this.$router.push({ path: targetPath })
+
+            // 添加调试信息
+            setTimeout(() => {
+              console.log('Current route after push:', this.$router.currentRoute)
+            }, 500)
+
             this.loading = false
-          }).catch(() => {
+          }).catch(error => {
+            console.error('Store dispatch login error:', error)
+            this.$message.error('Login failed, please try again')
             this.loading = false
           })
         } else {
@@ -121,14 +109,12 @@ export default {
         }
       })
     }
+
   }
 }
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
 $bg:#283443;
 $light_gray:#fff;
 $cursor: #fff;
