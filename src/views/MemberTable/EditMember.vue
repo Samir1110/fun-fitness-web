@@ -29,6 +29,9 @@
         <el-form-item label="剩余课时">
           <el-input v-model="form.cardNextClass" />
         </el-form-item>
+        <el-form-item label="积分">
+          <el-input v-model="form.memberCredit" />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="handleClose">取消</el-button>

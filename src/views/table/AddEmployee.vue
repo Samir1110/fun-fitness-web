@@ -48,7 +48,7 @@ export default {
       rules: {
         employeeName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         employeeGender: [{ required: true, message: '请输入性别', trigger: 'blur' }],
-        employeeAge: [{ required: true, message: '请输入年龄', type: 'number', trigger: 'blur' }],
+        employeeAge: [{ required: true, message: '请输入年龄', trigger: 'blur' }],
         staff: [{ required: true, message: '请输入职位', trigger: 'blur' }]
       }
     }

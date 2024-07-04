@@ -114,7 +114,7 @@ export const constantRoutes = [
         path: 'index',
         name: '表单',
         component: () => import('@/views/form/index'),
-        meta: { title: '论坛管理', icon: 'form' }
+        meta: { title: '商城管理', icon: 'form' }
       }
     ]
   },
@@ -123,7 +123,7 @@ export const constantRoutes = [
     component: Layout,
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
+        path: 'https://gitee.com/susu-5ive/vue-admin-template',
         meta: { title: '项目地址', icon: 'link' }
       }
     ]

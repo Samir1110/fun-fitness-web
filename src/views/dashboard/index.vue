@@ -30,6 +30,17 @@
           {{ scope.row.time }}
         </template>
       </el-table-column>
+      <el-table-column align="center" label="操作" width="100">
+        <template slot-scope="scope">
+          <el-button
+            type="danger"
+            size="mini"
+            @click="deletePeople(scope.row.memberAccount)"
+          >
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -69,6 +80,21 @@ export default {
       const minutes = String(now.getMinutes()).padStart(2, '0')
       const seconds = String(now.getSeconds()).padStart(2, '0')
       this.currentTime = `${hours}:${minutes}:${seconds}`
+    },
+    deletePeople(memberAccount) {
+      this.listLoading = true
+      axios.post('http://localhost:8080/gym/deletePeople', null, {
+        params: {
+          memberAccount: memberAccount
+        }
+      })
+        .then(response => {
+          this.fetchData() // 重新获取数据
+        })
+        .catch(error => {
+          console.error('Error deleting data:', error)
+          this.listLoading = false
+        })
     }
   }
 }
@@ -94,6 +120,6 @@ export default {
     margin-top: 30px;
     margin-bottom: 30px; /* 调整下方距离 */
     margin-left: 30px;
-}
+  }
 }
 </style>

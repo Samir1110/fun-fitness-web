@@ -71,6 +71,11 @@
           {{ scope.row.cardNextClass }}
         </template>
       </el-table-column>
+      <el-table-column label="积分" width="100" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.memberCredit }}
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="250">
         <template #default="scope">
           <el-button-group>

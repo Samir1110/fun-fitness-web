@@ -23,6 +23,9 @@
         <el-form-item label="课时" prop="cardClass">
           <el-input v-model="form.cardClass" type="number" />
         </el-form-item>
+        <el-form-item label="积分" prop="memberCredit">
+          <el-input v-model="form.memberCredit" type="number" />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="handleClose">取消</el-button>
@@ -51,19 +54,21 @@ export default {
         memberHeight: null,
         memberWeight: null,
         memberPhone: '',
-        cardClass: null
+        cardClass: null,
+        memberCredit: 50
       },
       rules: {
         memberName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         memberGender: [{ required: true, message: '请输入性别', trigger: 'blur' }],
-        memberAge: [{ required: true, message: '请输入年龄', type: 'number', trigger: 'blur' }],
-        memberHeight: [{ required: true, message: '请输入身高', type: 'number', trigger: 'blur' }],
-        memberWeight: [{ required: true, message: '请输入体重', type: 'number', trigger: 'blur' }],
+        memberAge: [{ required: true, message: '请输入年龄', trigger: 'blur' }],
+        memberHeight: [{ required: true, message: '请输入身高', trigger: 'blur' }],
+        memberWeight: [{ required: true, message: '请输入体重', trigger: 'blur' }],
         memberPhone: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
           { validator: this.checkPhone, trigger: 'blur' }
         ],
-        cardClass: [{ required: true, message: '请输入课时', type: 'number', trigger: 'blur' }]
+        cardClass: [{ required: true, message: '请输入课时', trigger: 'blur' }],
+        memberCredit: [{ required: true, message: '请输入积分', trigger: 'blur' }]
       }
     }
   },
